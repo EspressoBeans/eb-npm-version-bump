@@ -52,7 +52,7 @@ The **run.sh** script is a sample script which calls the **npm_version.sh** scri
 
 #### Debugging in Windows
 
-In order to debug this script in VS Code in Windows, you need to have WSL (Windows Subsystem Linux) installed. There
+In order to debug this script in VS Code in Windows, you need to have WSL (Windows Subsystem Linux) installed.  This is because the script uses the running *NIX instance to run the shell script.
 
   
 
