@@ -13,12 +13,13 @@ It currently accounts only for `latest`, `alpha`, and `beta` `dist-tags`.
     --package  : the package name (including scope if neccessary),                        (ex: --package="@cranewwl_org/cranewwl-rfqapp")
     --path     : the path where to find the package.json of the package     (ex: --path="./SourceCode/react-app")
     --tag      : the desired dist-tag to publish with (latest, alpha, beta) (ex: --tag="alpha")
+    [-P]       : this denotes a private repository.  this will cause the use of npm login credentials (user, password, email)
     [-M | -m]  : M = major, m = minor, this will bump version by a patch number unless -M or -m is specified
 
     Note that you have to use the parameter name, then the equals sign, then the argument in quotes: --parm="argument"
     The M | m is a switch that does not require an argument string
 
-    Vic Guadalupe, Crane Worldwide Logistics
+    Vic Guadalupe
 ```
 
 

@@ -3,15 +3,16 @@
 #
 echo --SET CLI PARAMETER DEFAULTS--
 # ARGUMENTS
-NPM_USER=cranewwl
-NPM_PASSWORD=CraneWorldwide1776
-NPM_EMAIL=vic.guadalupe@craneww.com
-NPM_PACKAGE=@cranewwl_org/cranewwl-rfqapp
-NPM_PACKAGE_PATH=/mnt/c/Users/vic.guadalupe/SourceCode/cranerfqapp  #/mnt/c  EQUATES TO MOUNTED C DRIVE FOR WINDOWS USING WSL
+NPM_USER=
+NPM_PASSWORD=
+NPM_EMAIL=
+NPM_PACKAGE=
+NPM_PACKAGE_PATH=  #/mnt/c  EQUATES TO MOUNTED C DRIVE FOR WINDOWS USING WSL
 NPM_TAG=latest
 
 # INTERNALLY EVALUATED VARIABLES
 NPM_PACKAGE_VERSION=$(node -p "require('${NPM_PACKAGE_PATH}/package.json').version") #PULLS PACKAGE.JSON VERSION
+PRIVATE=false
 ALPHA_TAG=alpha
 BETA_TAG=beta
 MAJOR=false
@@ -30,9 +31,10 @@ do
         --email=*)    NPM_EMAIL=${arg#*=}          ;;
         --package=*)  NPM_PACKAGE=${arg#*=}        ;;
         --path=*)     NPM_PACKAGE_PATH=${arg#*=}   ;;
-        --tag=*)      NPM_TAG=${arg#*=}            ;;      
-        -M)         MAJOR=true                     ;;      
-        -m)         MINOR=true                     ;;   
+        --tag=*)      NPM_TAG=${arg#*=}            ;;
+        -P)           PRIVATE=true                  ;;
+        -M)           MAJOR=true                   ;;      
+        -m)           MINOR=true                   ;;   
         --help) 
             echo './npm_version.sh 
                 --user     : the npm registry account user                              (ex: --user="james")
@@ -41,12 +43,13 @@ do
                 --package  : the package name (including scope),                        (ex: --package="@cranewwl_org/cranewwl-rfqapp")
                 --path     : the path where to find the package.json of the package     (ex: --path="./SourceCode/react-app")
                 --tag      : the desired dist-tag to publish with (latest, alpha, beta) (ex: --tag="alpha")
+                [-P]       : this denotes a private repository.  this will cause the use of npm login credentials (user, password, email)
                 [-M | -m]  : M = major, m = minor, this will bump version by a patch number unless -M or -m is specified
 
                 Note that you have to use the parameter name, then the equals sign, then the argument in quotes: --parm="argument"
                 The M | m is a switch that does not require an argument string
 
-                Vic Guadalupe, Crane Worldwide Logistics
+                Vic Guadalupe
             '
             exit 0 
             ;;
@@ -57,16 +60,25 @@ do
      esac
 done
 
+
+
 # IF EITHER THE MAJOR OR MINOR SWITCH IS PASSED, SET PATCH TO TRUE
-if [[ $MAJOR == true || $MINOR == true ]]; then
+if [[ $MAJOR == true || $MINOR == true ]]
+then
     PATCH=false
 else
     PATCH=true
 fi;
 
 #
-echo --LOGIN TO NPM PRIVATE REPO--
-npm-cli-login -u ${NPM_USER} -p ${NPM_PASSWORD} -e ${NPM_EMAIL}
+# IF PRIVATE SWITCH WAS USED, THEN MAKE SURE THAT THE NPM USER/PASSWORD/EMAIL ARE PASSED IN
+if [ $PRIVATE == true ] 
+then
+    # DO SOMETHING
+    echo --LOGIN TO NPM PRIVATE REPO--
+    npm-cli-login -u ${NPM_USER} -p ${NPM_PASSWORD} -e ${NPM_EMAIL}
+fi
+
 
 #
 echo --PULL VERSIONS OF PACKAGE--
