@@ -1,0 +1,2 @@
+PUBLISH_VERSION=1.1.47-alpha.2
+PUBLISH_SCRIPT=npm publish --tag alpha
