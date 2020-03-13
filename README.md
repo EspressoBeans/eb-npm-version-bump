@@ -26,3 +26,4 @@ It currently accounts only for `latest`, `alpha`, and `beta` `dist-tags`.
 **TODO**
 
 - Need to be able to commit new version in git repo when there is descrepancy between npm version and package.json version.
+- Explain how to debug this with VS Code in Windows (using WSL)
