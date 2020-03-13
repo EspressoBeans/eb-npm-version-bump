@@ -24,5 +24,5 @@ It currently accounts only for `latest`, `alpha`, and `beta` `dist-tags`.
 
 
 **TODO**
-- Currently only used for private repos, need to add flag that will bypass npm login when publishing public repos
+
 - Need to be able to commit new version in git repo when there is descrepancy between npm version and package.json version.
