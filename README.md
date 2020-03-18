@@ -67,8 +67,6 @@ In order to debug this script in VS Code in Windows, you need to have WSL (Windo
 
 #### TODO
 
-  
-
 - Need to be able to commit new version in git repo when there is descrepancy between npm version and package.json version.
-
 - Explain how to debug this with VS Code in Windows (using WSL)
+- Update how paths are read into application as an argument (a path with spaces causes issues)

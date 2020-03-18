@@ -1,2 +1,3 @@
-PUBLISH_VERSION=1.1.47-alpha.2
-PUBLISH_SCRIPT=npm publish --tag alpha
+PUBLISH_VERSION=1.1.47-beta.4
+PUBLISH_SCRIPT=npm publish --tag beta
+PACKAGE_PATH=/mnt/c/Users/vic.guadalupe/SourceCode/cranerfqapp

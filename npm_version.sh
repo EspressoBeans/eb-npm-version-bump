@@ -3,16 +3,24 @@
 #
 echo --SET CLI PARAMETER DEFAULTS--
 # ARGUMENTS
-NPM_USER=
-NPM_PASSWORD=
-NPM_EMAIL=
-NPM_PACKAGE=
-NPM_PACKAGE_PATH=  #/mnt/c  EQUATES TO MOUNTED C DRIVE FOR WINDOWS USING WSL
+NPM_USER=cranewwl                            # REQUIRED IF USING -P SWITCH
+NPM_PASSWORD=CraneWorldwide1776              # REQUIRED IF USING -P SWITCH
+NPM_EMAIL=vic.guadalupe@craneww.com          # REQUIRED IF USING -P SWITCH
+NPM_PACKAGE=@cranewwl_org/cranewwl-rfqapp    # REQUIRED
 NPM_TAG=latest
+NPM_PRIVATE=false
+
+# ARGUMENTS FOR DEVELOPMENT TESTING
+DEVELOPMENT=false
+LOCAL_PATH='/mnt/c/Users/vic.guadalupe/SourceCode/cranerfqapp'  # REQUIRED IF USING -d SWITCH
+
+# INTERNAL CONSTANTS
+QA_PATH='C:\\Program Files (x86)\\Jenkins\\workspace\\AppBuild-QA\\SourceCode'     # A DEFAULT PATH TO THE APP'S QA SOURCE
+TEST_PATH='C:\\Program Files (x86)\\Jenkins\\workspace\\AppBuild-TEST\\SourceCode' # A DEFAULT PATH TO THE APP'S TEST SOURCE
+PROD_PATH='C:\\Program Files (x86)\\Jenkins\\workspace\\AppBuild-PROD\\SourceCode' # A DEFAULT PATH TO THE APP'S PROAD SOURCE
 
 # INTERNALLY EVALUATED VARIABLES
-NPM_PACKAGE_VERSION=$(node -p "require('${NPM_PACKAGE_PATH}/package.json').version") #PULLS PACKAGE.JSON VERSION
-PRIVATE=false
+NPM_PACKAGE_PATH=
 ALPHA_TAG=alpha
 BETA_TAG=beta
 MAJOR=false
@@ -30,24 +38,33 @@ do
         --password=*) NPM_PASSWORD=${arg#*=}       ;;
         --email=*)    NPM_EMAIL=${arg#*=}          ;;
         --package=*)  NPM_PACKAGE=${arg#*=}        ;;
-        --path=*)     NPM_PACKAGE_PATH=${arg#*=}   ;;
-        --tag=*)      NPM_TAG=${arg#*=}            ;;
-        -P)           PRIVATE=true                  ;;
+        --tag=*)      NPM_TAG=${arg#*=}            ;;   
+        --path=*)     LOCAL_PATH="${arg#*=}"       ;;
+        -d)           DEVELOPMENT=true             ;;   
         -M)           MAJOR=true                   ;;      
         -m)           MINOR=true                   ;;   
+        -P)           NPM_PRIVATE=true             ;;
         --help) 
             echo './npm_version.sh 
+                --package  : REQUIRED, the package name (including scope if required),  (ex: --package="@cranewwl_org/cranewwl-rfqapp")        
                 --user     : the npm registry account user                              (ex: --user="james")
                 --password : the password associated with the npm registry account      (ex: --password="mypassword")
                 --email    : the email associated with the npm registry account         (ex: --email="email@yahoo.com")
-                --package  : the package name (including scope),                        (ex: --package="@cranewwl_org/cranewwl-rfqapp")
-                --path     : the path where to find the package.json of the package     (ex: --path="./SourceCode/react-app")
-                --tag      : the desired dist-tag to publish with (latest, alpha, beta) (ex: --tag="alpha")
-                [-P]       : this denotes a private repository.  this will cause the use of npm login credentials (user, password, email)
+                --tag      : the desired dist-tag to publish with (latest, alpha, beta) (ex: --tag="alpha") (latest is default)
+                --path     : when using the -d switch, pass the path to a package.json file 
+                             > \''/mnt/c/Users/vic.guadalupe/SourceCode/has space/cranerfqapp\''
+                             > \''C:\\Program Files (x86)\\Jenkins\\workspace\\RFQAppBuild-PROD\\SourceCode\''
+                -d         : to denote running this script in a development mode
                 [-M | -m]  : M = major, m = minor, this will bump version by a patch number unless -M or -m is specified
+                -P         : for logging into private npm repository (this requires npm-cli-login package), also
+                             the --user, --password, --email parameters are required for this.
 
                 Note that you have to use the parameter name, then the equals sign, then the argument in quotes: --parm="argument"
-                The M | m is a switch that does not require an argument string
+
+                --path     REQUIRED if using -d switch
+                --user     REQUIRED if using -P switch
+                --password REQUIRED if using -P switch
+                --email    REQUIRED if using -P switch
 
                 Vic Guadalupe
             '
@@ -60,25 +77,50 @@ do
      esac
 done
 
+# CREATE npm_publish_version.txt 
+echo --CREATE npm_publish_version.txt FILE FOR USE WITH INJECTING JENKINS VARIABLES
+rm npm_publish_version.txt
+touch npm_publish_version.txt
 
+# BASED ON PASSED TAG, SET NPM_PACKAGE_PATH
+echo --SETTING NPM_PACKAGE_PATH BASED ON PASSED TAG
+case $NPM_TAG in
+
+  latest | "")
+    NPM_PACKAGE_PATH=${PROD_PATH}
+    ;;
+  alpha)
+    NPM_PACKAGE_PATH=${QA_PATH}
+    ;;
+  beta)
+    NPM_PACKAGE_PATH=${TEST_PATH}
+    ;;
+  *)
+    echo -n "--URECOGNIZED TAG: ${NPM_TAG}" 
+    exit -1
+    ;;
+esac
+
+# IF USING DEVELOPMENT FLAG, THEN USE THE LOCAL PATH VARIABLE
+if [ $DEVELOPMENT == true ]; then
+    NPM_PACKAGE_PATH=${LOCAL_PATH}
+fi;
+
+echo '>>' NPM_PACKAGE_PATH: ${NPM_PACKAGE_PATH}
+NPM_PACKAGE_VERSION=$(node -p "require('${NPM_PACKAGE_PATH}/package.json').version") #PULLS PACKAGE.JSON VERSION
 
 # IF EITHER THE MAJOR OR MINOR SWITCH IS PASSED, SET PATCH TO TRUE
-if [[ $MAJOR == true || $MINOR == true ]]
-then
+if [[ $MAJOR == true || $MINOR == true ]]; then
     PATCH=false
 else
     PATCH=true
 fi;
 
 #
-# IF PRIVATE SWITCH WAS USED, THEN MAKE SURE THAT THE NPM USER/PASSWORD/EMAIL ARE PASSED IN
-if [ $PRIVATE == true ] 
-then
-    # DO SOMETHING
-    echo --LOGIN TO NPM PRIVATE REPO--
+if [[ $NPM_PRIVATE == true ]]; then
+echo --LOGIN TO NPM PRIVATE REPO--
     npm-cli-login -u ${NPM_USER} -p ${NPM_PASSWORD} -e ${NPM_EMAIL}
 fi
-
 
 #
 echo --PULL VERSIONS OF PACKAGE--
@@ -90,9 +132,9 @@ VERSION_LATEST_FULL=`npm show ${NPM_PACKAGE} version`
 VERSION_ALPHA_FULL=`npm show ${NPM_PACKAGE}@${ALPHA_TAG} version`
 VERSION_BETA_FULL=`npm show ${NPM_PACKAGE}@${BETA_TAG} version`
 
-echo  VERSION_LATEST_FULL: ${VERSION_LATEST_FULL}
-echo  VERSION_ALPHA_FULL: ${VERSION_ALPHA_FULL}
-echo  VERSION_BETA_FULL: ${VERSION_BETA_FULL}
+echo '>>' VERSION_LATEST_FULL: ${VERSION_LATEST_FULL}
+echo '>>' VERSION_ALPHA_FULL: ${VERSION_ALPHA_FULL}
+echo '>>' VERSION_BETA_FULL: ${VERSION_BETA_FULL}
 
 VERSION_LATEST_PATCH=${VERSION_LATEST_FULL##*.}
 # IF THE FULL VERSION STRING CONTAINS THE PRERELEASE STRING, THEN PARSE THE LAST BUILD NUMBER, ELSE RETURN NOTHING
@@ -156,14 +198,9 @@ echo --EXECUTING ALPHA VERSION PROCESS--
         VERSION_ALPHA_BUILD="$(($VERSION_ALPHA_BUILD + 1))"
     fi
 
-    # CHECK THAT CURRENT PACKAGE.JSON VERSION IS FOR BETA PUBLISHING
-    if [[ ! ${NPM_PACKAGE_VERSION} == *${ALPHA_TAG}* ]]
-    then
-        echo "THE package.json DOES NOT HAVE THE ${ALPHA_TAG} TAG"
-        # WE NEED TO UPDATE THE package.json TO A NEW ALPHA RELEASE
-        PUBLISH_VERSION=${VERSION_LATEST_FULL}-${ALPHA_TAG}.${VERSION_ALPHA_BUILD}
-        echo NEW VERSION TO PUBLISH: ${PUBLISH_VERSION}
-    fi
+    # PUT IT ALL TOGETHER
+    PUBLISH_VERSION=${VERSION_LATEST_FULL}-${ALPHA_TAG}.${VERSION_ALPHA_BUILD}
+    echo --NEW VERSION TO PUBLISH: ${PUBLISH_VERSION}
 fi
 
 # EVALUATE THE BETA IF IT IS WHAT WE ARE BUILDING
@@ -171,7 +208,7 @@ if [[ $NPM_TAG == $BETA_TAG ]]
 then
 echo --EXECUTING BETA VERSION PROCESS--
 
-    #CHECK IF WE ACTUALLY HAVE AN BETA DIST-TAG IN NPM REGISTRY
+    # CHECK IF WE ACTUALLY HAVE AN BETA DIST-TAG IN NPM REGISTRY
     if [ -z "$VERSION_BETA_BUILD" ]
     then
         echo --BETA DIST-TAG DOES NOT EXIST
@@ -179,17 +216,12 @@ echo --EXECUTING BETA VERSION PROCESS--
     else
         echo --BETA DIST-TAG EXISTS
         # LETS USE THE EXISTING BUILD NUMBER AND INCREMENT IT
-        VERSION_BETA_BUILD= echo "$(($VERSION_BETA_BUILD + 1))"
+        VERSION_BETA_BUILD="$(($VERSION_BETA_BUILD + 1))"
     fi
 
-    # CHECK THAT CURRENT PACKAGE.JSON VERSION IS FOR BETA PUBLISHING
-    if [[ ! ${NPM_PACKAGE_VERSION} == *${BETA_TAG}* ]]
-    then
-        echo "THE package.json DOES NOT HAVE THE ${BETA_TAG} TAG"
-        # WE NEED TO UPDATE THE package.json TO A NEW BETA RELEASE
-        PUBLISH_VERSION=${VERSION_LATEST_FULL}-${BETA_TAG}.${VERSION_BETA_BUILD}
-        echo NEW VERSION TO PUBLISH: ${PUBLISH_VERSION}
-    fi
+    # PUT IT ALL TOGETHER
+    PUBLISH_VERSION=${VERSION_LATEST_FULL}-${BETA_TAG}.${VERSION_BETA_BUILD}
+    echo --NEW VERSION TO PUBLISH: ${PUBLISH_VERSION}
 fi
 
 #
@@ -200,9 +232,10 @@ PUBLISH_SCRIPT="npm publish --tag "${VAR_TAG}
 
 #
 echo --WRITE TO FILE--
-echo PUBLISH VERSION: ${PUBLISH_VERSION}
-echo PUBLISH SCRIPT: ${PUBLISH_SCRIPT}
-rm npm_publish_version.txt
-touch npm_publish_version.txt
+echo '>>' PUBLISH VERSION: ${PUBLISH_VERSION}
+echo '>>' PUBLISH SCRIPT: ${PUBLISH_SCRIPT}
+echo '>>' PACKAGE PATH: ${NPM_PACKAGE_PATH}
 echo "PUBLISH_VERSION=${PUBLISH_VERSION}" >> npm_publish_version.txt
 echo "PUBLISH_SCRIPT=${PUBLISH_SCRIPT}" >> npm_publish_version.txt
+echo "PACKAGE_PATH=${NPM_PACKAGE_PATH}" >> npm_publish_version.txt
+
