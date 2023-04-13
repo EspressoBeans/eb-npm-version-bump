@@ -3,10 +3,10 @@
 #
 echo --SET CLI PARAMETER DEFAULTS--
 # ARGUMENTS
-NPM_USER=cranewwl                            # REQUIRED IF USING -P SWITCH
-NPM_PASSWORD=CraneWorldwide1776              # REQUIRED IF USING -P SWITCH
+NPM_USER=myuser                            # REQUIRED IF USING -P SWITCH
+NPM_PASSWORD=mypassword              # REQUIRED IF USING -P SWITCH
 NPM_EMAIL=vic.guadalupe@craneww.com          # REQUIRED IF USING -P SWITCH
-NPM_PACKAGE=@cranewwl_org/cranewwl-rfqapp    # REQUIRED
+NPM_PACKAGE=@my_org/my-app    # REQUIRED
 NPM_TAG=latest
 NPM_PRIVATE=false
 
