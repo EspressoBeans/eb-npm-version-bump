@@ -22,7 +22,7 @@ It currently accounts only for `latest`, `alpha`, and `beta`  `dist-tags`.
 	--user     : the npm registry account user                              (ex: --user="james")
 	--password : the password associated with the npm registry account      (ex: --password="mypassword")
 	--email    : the email associated with the npm registry account         (ex: --email="email@yahoo.com")
-	--package  : the package name (including scope if neccessary),          (ex: --package="@cranewwl_org/cranewwl-rfqapp")
+	--package  : the package name (including scope if neccessary),          (ex: --package="@my_org/my-app")
 	--path     : the path where to find the package.json of the package     (ex: --path="./SourceCode/react-app")
 	--tag      : the desired dist-tag to publish with (latest, alpha, beta) (ex: --tag="alpha")
 	[-P]       : this denotes a private repository. this will require the use of npm login credentials (user, password, email)
