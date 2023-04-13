@@ -4,9 +4,9 @@
 echo --SET CLI PARAMETER DEFAULTS--
 # ARGUMENTS
 NPM_USER=myuser                            # REQUIRED IF USING -P SWITCH
-NPM_PASSWORD=mypassword              # REQUIRED IF USING -P SWITCH
-NPM_EMAIL=vic.guadalupe@craneww.com          # REQUIRED IF USING -P SWITCH
-NPM_PACKAGE=@my_org/my-app    # REQUIRED
+NPM_PASSWORD=mypassword                    # REQUIRED IF USING -P SWITCH
+NPM_EMAIL=vic.guadalupe@org.com            # REQUIRED IF USING -P SWITCH
+NPM_PACKAGE=@my_org/my-app                 # REQUIRED
 NPM_TAG=latest
 NPM_PRIVATE=false
 
@@ -52,7 +52,7 @@ do
                 --email    : the email associated with the npm registry account         (ex: --email="email@yahoo.com")
                 --tag      : the desired dist-tag to publish with (latest, alpha, beta) (ex: --tag="alpha") (latest is default)
                 --path     : when using the -d switch, pass the path to a package.json file 
-                             > \''/mnt/c/Users/vic.guadalupe/SourceCode/has space/cranerfqapp\''
+                             > \''/mnt/c/Users/vic.guadalupe/SourceCode/has space/myapp\''
                              > \''C:\\Program Files (x86)\\Jenkins\\workspace\\RFQAppBuild-PROD\\SourceCode\''
                 -d         : to denote running this script in a development mode
                 [-M | -m]  : M = major, m = minor, this will bump version by a patch number unless -M or -m is specified
