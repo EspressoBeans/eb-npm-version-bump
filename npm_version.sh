@@ -12,7 +12,7 @@ NPM_PRIVATE=false
 
 # ARGUMENTS FOR DEVELOPMENT TESTING
 DEVELOPMENT=false
-LOCAL_PATH='/mnt/c/Users/vic.guadalupe/SourceCode/cranerfqapp'  # REQUIRED IF USING -d SWITCH
+LOCAL_PATH='/mnt/c/Users/vic.guadalupe/SourceCode/my-app'  # REQUIRED IF USING -d SWITCH
 
 # INTERNAL CONSTANTS
 QA_PATH='C:\\Program Files (x86)\\Jenkins\\workspace\\AppBuild-QA\\SourceCode'     # A DEFAULT PATH TO THE APP'S QA SOURCE
@@ -46,7 +46,7 @@ do
         -P)           NPM_PRIVATE=true             ;;
         --help) 
             echo './npm_version.sh 
-                --package  : REQUIRED, the package name (including scope if required),  (ex: --package="@cranewwl_org/cranewwl-rfqapp")        
+                --package  : REQUIRED, the package name (including scope if required),  (ex: --package="@my_org/my-app")        
                 --user     : the npm registry account user                              (ex: --user="james")
                 --password : the password associated with the npm registry account      (ex: --password="mypassword")
                 --email    : the email associated with the npm registry account         (ex: --email="email@yahoo.com")
